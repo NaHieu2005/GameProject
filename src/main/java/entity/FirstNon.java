@@ -11,7 +11,7 @@ public class FirstNon {
 
     public FirstNon(GamePanel gp){
         this.gp = gp;
-        gp.yuyuko.setHP(10);
+        gp.yuyuko.setHP(20000);
     }
 
     public void genBullet(double x, double y, double speed){
