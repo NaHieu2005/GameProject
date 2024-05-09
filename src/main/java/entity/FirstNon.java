@@ -11,7 +11,7 @@ public class FirstNon {
 
     public FirstNon(GamePanel gp){
         this.gp = gp;
-        gp.yuyuko.setHP(20000);
+        gp.yuyuko.setHP(25000);
     }
 
     public void genBullet(double x, double y, double speed){
@@ -58,7 +58,7 @@ public class FirstNon {
     private boolean checkEnd(){
         if (timer > time_out || gp.yuyuko.HP <= 0){
             gp.section++;
-            gp.yuyuko.setHP(10000);
+            gp.yuyuko.setHP(0);
             gp.stopMusic();
             gp.playMusic(7);
             return true;
