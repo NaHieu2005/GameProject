@@ -50,6 +50,7 @@ public class Shooting {
 
     public void update(){
         if (destroyed) return;
+        i -= 5;
         speedX = speed * Math.cos(Math.toRadians(angle));
         speedY = speed * Math.sin(Math.toRadians(angle));
         x += speedX;
@@ -62,7 +63,7 @@ public class Shooting {
         switch (type) {
             case 1: //amulet
                 AffineTransform at = AffineTransform.getTranslateInstance(x - amulet.getWidth()/2,y - amulet.getHeight()/2);
-                at.rotate(Math.toRadians(i-=5), amulet.getWidth()/2, amulet.getHeight()/2);
+                at.rotate(Math.toRadians(i), amulet.getWidth()/2, amulet.getHeight()/2);
 
                 g2d.drawImage(amulet, at, null);
                 break;

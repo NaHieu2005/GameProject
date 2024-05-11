@@ -26,13 +26,15 @@ public class KeyHandler implements KeyListener {
         if (gp.gameState == gp.titleState){
             if (gp.ui.titleScreenState == 0){
                 if (key == KeyEvent.VK_UP){
-                    if (gp.ui.cursor > 0) gp.ui.cursor--;
+                    gp.ui.cursor--;
+                    if (gp.ui.cursor < 0) gp.ui.cursor = 3;
                     gp.playSE(0);
                 }
 
                 if (key == KeyEvent.VK_DOWN){
-                    if (gp.ui.cursor < 3) gp.ui.cursor++;
-                    gp.playSE(0);
+                    gp.ui.cursor++;
+                    if (gp.ui.cursor > 3) gp.ui.cursor = 0;
+                        gp.playSE(0);
                 }
 
                 if (key == KeyEvent.VK_Z){
@@ -51,7 +53,7 @@ public class KeyHandler implements KeyListener {
                 }
             }
 
-            if (gp.ui.titleScreenState == 1){ //Char select
+            else if (gp.ui.titleScreenState == 1){ //Char select
                 if (key == KeyEvent.VK_ESCAPE){
                     gp.ui.characterState = 0;
                     gp.ui.titleScreenState = 0;
@@ -70,7 +72,7 @@ public class KeyHandler implements KeyListener {
                     gp.playSE(0);
                 }
 
-                if (key == KeyEvent.VK_ENTER){
+                if (key == KeyEvent.VK_Z){
                     gp.gameState = gp.playState;
                     gp.stopMusic();
                     gp.playMusic(6);
@@ -84,13 +86,53 @@ public class KeyHandler implements KeyListener {
                 }
             }
 
-            if (gp.ui.titleScreenState == 2){ //Tutorial
+            else if (gp.ui.titleScreenState == 2){ //Tutorial
                 if (key == KeyEvent.VK_ESCAPE){
                     gp.ui.titleScreenState = 0;
                     gp.playSE(1);
                 }
             }
         }
+
+        else if (gp.gameState == gp.playState){
+            if (key == KeyEvent.VK_ESCAPE){
+                gp.gameState = gp.pauseState;
+                gp.ui.cursor = 0;
+                gp.playSE(8);
+                gp.stopMusic();
+            }
+        }
+
+        else if (gp.gameState == gp.pauseState){
+            if (key == KeyEvent.VK_DOWN){
+                gp.ui.cursor++;
+                gp.playSE(0);
+                if (gp.ui.cursor > 2) gp.ui.cursor = 0;
+            }
+
+            if (key == KeyEvent.VK_UP){
+                gp.ui.cursor--;
+                gp.playSE(0);
+                if (gp.ui.cursor < 0) gp.ui.cursor = 2;
+            }
+
+            if (key == KeyEvent.VK_Z){
+                gp.playSE(2);
+                switch (gp.ui.cursor){
+                    case 0: //return to game
+                        gp.gameState = gp.playState;
+                        gp.resumeMusic();
+                        break;
+                    case 1: //quit and return to title
+                        gp.setup();
+                        break;
+                    case 2: //try again
+                        gp.restart();
+                        break;
+                }
+            }
+        }
+
         if (key == KeyEvent.VK_UP) {
             upPressed = true;
         }

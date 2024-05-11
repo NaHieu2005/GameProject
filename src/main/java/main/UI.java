@@ -29,16 +29,47 @@ public class UI {
     public void draw(Graphics2D g2){
         this.g2 = g2;
 
-        g2.setFont(pcb_font);
-        g2.setFont(g2.getFont().deriveFont(Font.BOLD,40f));
-        g2.setColor(Color.GRAY);
-
         if (gp.gameState == gp.titleState){
             drawTitleScreen();
         }
 
-        //g2.drawString("" + time_left/60, gp.screenWidth - 50, 40);
-        //g2.drawString("Number of Bullets on screen: " + numberOfBullets, 20, 600);
+        if (gp.gameState == gp.pauseState){
+            drawPauseScreen();
+        }
+    }
+
+    private void drawPauseScreen() {
+        BufferedImage pause = null, return_to_game = null, quit_to_title = null, try_again = null, blur = null;
+        int x = gp.screenWidth/2;
+        int y = gp.screenHeight/2;
+
+        try {
+            pause = ImageIO.read(getClass().getResourceAsStream("/player/pause.png"));
+            return_to_game = ImageIO.read(getClass().getResourceAsStream("/player/return_to_game.png"));
+            quit_to_title = ImageIO.read(getClass().getResourceAsStream("/player/quit_to_title.png"));
+            try_again = ImageIO.read(getClass().getResourceAsStream("/player/try_again.png"));
+            blur = ImageIO.read(getClass().getResourceAsStream("/player/blurpane.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        g2.drawImage(return_to_game, x - return_to_game.getWidth()/2, y,null);
+        g2.drawImage(quit_to_title, x - quit_to_title.getWidth()/2, y + 55, null);
+        g2.drawImage(try_again, x - try_again.getWidth()/2, y + 110, null);
+
+        g2.drawImage(blur, 0, 0, gp.screenWidth, gp.screenHeight, null);
+        g2.drawImage(pause, x - pause.getWidth()/2, y - 125, null);
+        switch (cursor){
+            case 0: //return to game
+                g2.drawImage(return_to_game, x - return_to_game.getWidth()/2, y,null);
+                break;
+            case 1: //quit to title
+                g2.drawImage(quit_to_title, x - quit_to_title.getWidth()/2, y + 55, null);
+                break;
+            case 2:
+                g2.drawImage(try_again, x - try_again.getWidth()/2, y + 110, null);
+                break;
+        }
     }
 
     public void drawTitleScreen(){
@@ -103,7 +134,7 @@ public class UI {
                 break;
             case 1: //Character Select
                 BufferedImage charImg = null;
-                BufferedImage charPreview = null;
+                BufferedImage choose_girl = null;
                 BufferedImage s_bg = null;
                 BufferedImage name = null;
                 BufferedImage stat = null;
@@ -111,7 +142,6 @@ public class UI {
 
                 g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40f));
                 g2.setColor(Color.PINK);
-                g2.drawString("Select your character", 125, 70);
                 x = 400;
                 y = 500;
 
@@ -120,7 +150,7 @@ public class UI {
                     try {
                         s_bg = ImageIO.read(getClass().getResourceAsStream("/player/select_bg.png"));
                         charImg = ImageIO.read(getClass().getResourceAsStream("/player/reimu_select.png"));
-                        charPreview = ImageIO.read(getClass().getResourceAsStream("/player/reimu_idle1.png"));
+                        choose_girl = ImageIO.read(getClass().getResourceAsStream("/player/choose_girl.png"));
                         name = ImageIO.read(getClass().getResourceAsStream("/player/reimu_name.png"));
                         stat = ImageIO.read(getClass().getResourceAsStream("/player/reimu_stat.png"));
                         diff = ImageIO.read(getClass().getResourceAsStream("/player/lunatic.png"));
@@ -129,19 +159,20 @@ public class UI {
                     }
 
                     g2.drawImage(s_bg, 0, 0, gp.screenWidth, gp.screenHeight, null);
+                    g2.drawImage(choose_girl, gp.screenWidth/2 - choose_girl.getWidth()/2, 100 - choose_girl.getHeight()/2, null);
                     g2.drawImage(charImg, x - charImg.getWidth()/2, y - charImg.getHeight()/2, null);
-                    g2.drawImage(name, x + 50 - name.getWidth()/2, y + 75 - name.getHeight()/2, null);
-                    g2.drawImage(stat, x + 25 - stat.getWidth()/2, y + 150 - stat.getHeight()/2, null);
+                    g2.drawImage(name, x + 20 - name.getWidth()/2, y + 50 - name.getHeight()/2, null);
+                    g2.drawImage(stat, x + 20 - stat.getWidth()/2, y + 130 - stat.getHeight()/2, null);
                     g2.drawImage(diff, 25, 675, null);
                     //g2.drawImage(charPreview, 425, 400, 100, 100, null);
                 }
 
-                if (characterState == 1){//MARISA
+                if (characterState == 1){//Marisa
                     //IMAGE
                     try {
                         s_bg = ImageIO.read(getClass().getResourceAsStream("/player/select_bg.png"));
                         charImg = ImageIO.read(getClass().getResourceAsStream("/player/marisa_select.png"));
-                        charPreview = ImageIO.read(getClass().getResourceAsStream("/player/marisa_idle1.png"));
+                        choose_girl = ImageIO.read(getClass().getResourceAsStream("/player/choose_girl.png"));
                         name = ImageIO.read(getClass().getResourceAsStream("/player/marisa_name.png"));
                         stat = ImageIO.read(getClass().getResourceAsStream("/player/marisa_stat.png"));
                         diff = ImageIO.read(getClass().getResourceAsStream("/player/lunatic.png"));
@@ -150,9 +181,10 @@ public class UI {
                     }
 
                     g2.drawImage(s_bg, 0, 0, gp.screenWidth, gp.screenHeight, null);
+                    g2.drawImage(choose_girl, gp.screenWidth/2 - choose_girl.getWidth()/2, 100 - choose_girl.getHeight()/2, null);
                     g2.drawImage(charImg, x - charImg.getWidth()/2, y - charImg.getHeight()/2, null);
-                    g2.drawImage(name, x + 50 - name.getWidth()/2, y + 75 - name.getHeight()/2, null);
-                    g2.drawImage(stat, x + 25 - stat.getWidth()/2, y + 150 - stat.getHeight()/2, null);
+                    g2.drawImage(name, x + 20 - name.getWidth()/2, y + 50 - name.getHeight()/2, null);
+                    g2.drawImage(stat, x + 20 - stat.getWidth()/2, y + 130 - stat.getHeight()/2, null);
                     g2.drawImage(diff, 25, 675, null);
                     //g2.drawImage(charPreview, 425, 400, 100, 100, null);
                 }

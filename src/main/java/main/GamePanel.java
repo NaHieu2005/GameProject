@@ -4,6 +4,7 @@ import entity.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.plaf.LayerUI;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -15,7 +16,7 @@ public class GamePanel extends JPanel implements Runnable{
     public final int tileSize = originalTileSize * scale;  //64x64
     final int maxScreenCol = 10;
     final int maxScreenRow = 12;
-    public final int screenWidth = maxScreenCol * tileSize;  //576
+    public final int screenWidth = maxScreenCol * tileSize;  //640
     public final int screenHeight = maxScreenRow * tileSize; //768
 
 
@@ -26,11 +27,11 @@ public class GamePanel extends JPanel implements Runnable{
 
     //Class
     public Player player;
-    UI ui = new UI(this);
-    public Enemy yuyuko = new Enemy(this);
-    FirstNon firstNon = new FirstNon(this);
-    Projectile pr = new Projectile(this);
-    BackgroundManager bg = new BackgroundManager(this);
+    UI ui;
+    public Enemy yuyuko;
+    FirstNon firstNon;
+    Projectile pr;
+    BackgroundManager bg;
     Sound se = new Sound();
     Sound bgm = new Sound();
 
@@ -45,8 +46,7 @@ public class GamePanel extends JPanel implements Runnable{
     public int gameState;
     public int titleState = 0;
     public final int playState = 1;
-    public final int tutorialState = 2;
-    public final int musicState = 3;
+    public final int pauseState = 2;
 
     public int section = 1;
     public final int firstNonSection = 1;
@@ -66,7 +66,26 @@ public class GamePanel extends JPanel implements Runnable{
 
     public void setup(){
         gameState = titleState;
+        ui = new UI(this);
+        yuyuko = new Enemy(this);
+        firstNon = new FirstNon(this);
+        pr = new Projectile(this);
+        bg = new BackgroundManager(this);
+        section = 1;
+        if (bgm.clip != null) stopMusic();
         playMusic(5);
+    }
+
+    public void restart(){
+        gameState = playState;
+        ui = new UI(this);
+        yuyuko = new Enemy(this);
+        firstNon = new FirstNon(this);
+        pr = new Projectile(this);
+        bg = new BackgroundManager(this);
+        section = 1;
+        if (bgm.clip != null) stopMusic();
+        playMusic(6);
     }
 
     public void startGame(){
@@ -117,6 +136,10 @@ public class GamePanel extends JPanel implements Runnable{
             yuyuko.update();
             player.update();
         }
+        if (gameState == pauseState){
+            //nothing
+        }
+
     }
 
     public void paintComponent(Graphics g){
@@ -136,6 +159,15 @@ public class GamePanel extends JPanel implements Runnable{
             if (section == finalSpellSection) pr.draw(g2d);
         }
 
+        if (gameState == pauseState){
+            bg.draw(g2d);
+            yuyuko.draw(g2d);
+            player.draw(g2d);
+            if (section == firstNonSection) firstNon.draw(g2d);
+            if (section == finalSpellSection) pr.draw(g2d);
+            ui.draw(g2d);
+        }
+
         g2d.dispose();
     }
 
@@ -143,6 +175,10 @@ public class GamePanel extends JPanel implements Runnable{
         bgm.setFile(i);
         bgm.play();
         bgm.loop();
+    }
+
+    public void resumeMusic(){
+        bgm.play();
     }
 
     public void stopMusic(){

@@ -26,6 +26,7 @@ public class BackgroundManager {
         public Cherry(double speed, int type){
             this.speed = speed;
             try {
+                if (type == 0) img = ImageIO.read(getClass().getResourceAsStream("/player/cherry0.png"));
                 if (type == 1) img = ImageIO.read(getClass().getResourceAsStream("/player/cherry1.png"));
                 if (type == 2) img = ImageIO.read(getClass().getResourceAsStream("/player/cherry2.png"));
 
@@ -61,6 +62,12 @@ public class BackgroundManager {
     }
 
     void erase(){
+        if (!cherries0.isEmpty()) {
+            while (cherries0.getFirst().y < -500) {
+                cherries0.removeFirst();
+            }
+        }
+
         if (!cherries1.isEmpty()) {
             while (cherries1.getFirst().y < -500) {
                 cherries1.removeFirst();
@@ -74,6 +81,7 @@ public class BackgroundManager {
         }
     }
 
+    ArrayList<Cherry> cherries0 = new ArrayList<>();
     ArrayList<Cherry> cherries1 = new ArrayList<>();
     ArrayList<Cherry> cherries2 = new ArrayList<>();
     ArrayList<BGEffect> effects = new ArrayList<>();
@@ -82,6 +90,14 @@ public class BackgroundManager {
         erase();
 
         //init
+        if (cherries0.isEmpty()){
+            for (int i = 5; i >= 0; i--) {
+                Cherry cherry = new Cherry(1.6, 0);
+                cherry.setPos(0, gp.screenHeight - i * gp.screenWidth/2);
+                cherries0.add(cherry);
+            }
+        }
+        System.out.println(cherries0.getLast().y);
         if (cherries1.isEmpty()){
             for (int i = 5; i >= 0; i--) {
                 Cherry cherry = new Cherry(2, 1);
@@ -105,6 +121,11 @@ public class BackgroundManager {
         }
 
         //loop
+        if (Math.round(cherries0.getLast().y) == gp.screenHeight - gp.screenWidth/2){
+            Cherry cherry = new Cherry(1.6, 0);
+            cherries0.add(cherry);
+        }
+
         if (cherries1.getLast().y == gp.screenHeight - gp.screenWidth/2){
             Cherry cherry = new Cherry(2, 1);
             cherries1.add(cherry);
@@ -121,6 +142,10 @@ public class BackgroundManager {
         }
 
         //update
+        for (int i = 0; i < cherries0.size(); i++){
+            cherries0.get(i).update();
+        }
+
         for (int i = 0; i < cherries1.size(); i++){
             cherries1.get(i).update();
         }
@@ -136,6 +161,10 @@ public class BackgroundManager {
 
     public void draw(Graphics2D g2d){
         g2d.drawImage(bg,0,0, gp.screenWidth, gp.screenHeight, null);
+
+        for (int i = 0; i < cherries0.size(); i++){
+            cherries0.get(i).draw(g2d);
+        }
 
         for (int i = 0; i < cherries1.size(); i++){
             cherries1.get(i).draw(g2d);

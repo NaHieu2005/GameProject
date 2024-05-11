@@ -11,7 +11,7 @@ import java.nio.Buffer;
 public class Enemy {
     GamePanel gp;
     double x, y, speed = 0.25, hitboxRange;
-    BufferedImage idle1, idle2, fan;
+    BufferedImage idle1, ghost, fan;
     int spriteNum = 0, spriteCounter = 0;
     boolean fanVisible = false;
     public double HP, maxHP;
@@ -26,7 +26,7 @@ public class Enemy {
     private void setImg(){
         try {
             idle1 = ImageIO.read(getClass().getResourceAsStream("/player/yuyuko_idle1.png"));
-            idle2 = ImageIO.read(getClass().getResourceAsStream("/player/yuyuko_idle2.png"));
+            ghost = ImageIO.read(getClass().getResourceAsStream("/player/yuyuko_ghost.png"));
             fan = ImageIO.read(getClass().getResourceAsStream("/player/yuyuko_fan.png"));
         }
         catch(IOException e){
@@ -52,6 +52,7 @@ public class Enemy {
 
     public void checkgetHit()
     {
+        if (gp.section == gp.finalSpellSection) return;
         for (int i = 0; i < gp.player.shoot.size(); i++){
             if (gp.player.shoot.get(i) != null){
                 Shooting s = gp.player.shoot.get(i);
@@ -79,18 +80,13 @@ public class Enemy {
 
     public void draw(Graphics2D g2d){
         //Sprite
-        BufferedImage img = null;
-        switch (spriteNum){
-            case 0:
-                img = idle1;
-                break;
-            case 1:
-                img = idle2;
-                break;
-        }
 
         if (fanVisible) g2d.drawImage(fan, (int)x - fan.getWidth()/2, (int)y - fan.getHeight()/2, null);
-        g2d.drawImage(idle1, (int) x - idle1.getWidth()/2, (int) y - idle1.getHeight()/2, null);
+        if (gp.section == gp.finalSpellSection) {
+            g2d.drawImage(ghost, (int)x - ghost.getWidth()/2, (int)y - ghost.getHeight()/2, null);
+            return;
+        }
+        else g2d.drawImage(idle1, (int) x - idle1.getWidth()/2, (int) y - idle1.getHeight()/2, null);
 
         //HP
         g2d.setColor(Color.WHITE);

@@ -37,6 +37,7 @@ public class Player{
     public int invicible = 0;
     double i = 0;
     double j = 0;
+    double k = 0;
     int timer;
 
     ArrayList<Hitboxes> hitboxesPool = new ArrayList<>();
@@ -82,6 +83,7 @@ public class Player{
     }
 
     public void update(){
+        i+=3; j-=3; k-=3;
         for (int i = 0; i < shoot.size(); i++){
             Shooting s = shoot.get(i);
             if (s.destroyed == true || s.x < 0 || s.x > gp.screenWidth || s.y < 0){
@@ -151,13 +153,13 @@ public class Player{
                 shoot.add(focus);
                 Shooting amulet1 = new Shooting(x, y, 90, 1);
                 shoot.add(amulet1);
-                Shooting amulet2 = new Shooting(x, y, 92, 1);
+                Shooting amulet2 = new Shooting(x, y, 95, 1);
                 shoot.add(amulet2);
-                Shooting amulet3 = new Shooting(x, y, 95, 1);
+                Shooting amulet3 = new Shooting(x, y, 100, 1);
                 shoot.add(amulet3);
-                Shooting amulet4 = new Shooting(x, y, 88, 1);
+                Shooting amulet4 = new Shooting(x, y, 85, 1);
                 shoot.add(amulet4);
-                Shooting amulet5 = new Shooting(x, y, 85, 1);
+                Shooting amulet5 = new Shooting(x, y, 80, 1);
                 shoot.add(amulet5);
             }
             else {
@@ -302,26 +304,26 @@ public class Player{
         //focus
         if (focusing == true) {
             AffineTransform at1 = AffineTransform.getTranslateInstance(x - hitbox.getWidth()/2, y - hitbox.getHeight()/2);
-            at1.rotate(Math.toRadians(i-=0.05), hitbox.getWidth()/2, hitbox.getHeight()/2);
+            at1.rotate(Math.toRadians(k), hitbox.getWidth()/2, hitbox.getHeight()/2);
             g2d.drawImage(hitbox, at1, null);
 
             //yinyang balls
             AffineTransform at = AffineTransform.getTranslateInstance(x - 10 - yinyang.getWidth()/2, y - 40 - yinyang.getHeight()/2);
-            at.rotate(Math.toRadians(i-=3), yinyang.getWidth()/2, yinyang.getHeight()/2);
+            at.rotate(Math.toRadians(i), yinyang.getWidth()/2, yinyang.getHeight()/2);
             g2d.drawImage(yinyang, at, null);
 
             at = AffineTransform.getTranslateInstance(x + 10 - yinyang.getWidth()/2, y - 40 - yinyang.getHeight()/2);
-            at.rotate(Math.toRadians(j+=3), yinyang.getWidth()/2, yinyang.getHeight()/2);
+            at.rotate(Math.toRadians(j), yinyang.getWidth()/2, yinyang.getHeight()/2);
             g2d.drawImage(yinyang, at, null);
         }
         else {
             //yinyang balls
             AffineTransform at = AffineTransform.getTranslateInstance(x - 30 - yinyang.getWidth()/2, y - yinyang.getHeight()/2);
-            at.rotate(Math.toRadians(i-=3), yinyang.getWidth()/2, yinyang.getHeight()/2);
+            at.rotate(Math.toRadians(i), yinyang.getWidth()/2, yinyang.getHeight()/2);
             g2d.drawImage(yinyang, at, null);
 
             at = AffineTransform.getTranslateInstance(x + 30 - yinyang.getWidth()/2, y - yinyang.getHeight()/2);
-            at.rotate(Math.toRadians(j+=3), yinyang.getWidth()/2, yinyang.getHeight()/2);
+            at.rotate(Math.toRadians(j), yinyang.getWidth()/2, yinyang.getHeight()/2);
             g2d.drawImage(yinyang, at, null);
         }
     }

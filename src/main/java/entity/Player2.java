@@ -43,6 +43,7 @@ public class Player2 extends Player{
 
     @Override
     public void update() {
+        i+=3; j-=3; k-=3;
         for (int i = 0; i < shoot.size(); i++){
             Shooting s = shoot.get(i);
             if (s.destroyed == true || s.x < 0 || s.x > gp.screenWidth || s.y < 0){

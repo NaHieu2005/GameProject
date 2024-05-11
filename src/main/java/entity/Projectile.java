@@ -31,7 +31,7 @@ public class Projectile{
         this.gp = gp;
         this.x = gp.screenWidth/2;
         this.y = 150;
-        this.bulletManager = new BulletManager(x, y);
+        this.bulletManager = new BulletManager(x, y, 0);
         getImg();
     }
 
@@ -82,7 +82,6 @@ public class Projectile{
 
     public void blue_wave(int idx){
         ArrayList<BulletSpawner> temp = new ArrayList<>();
-        double angle = 12.85714285714286;
 
         if (timer % cycle == 3*60 + 20*idx){
             if (blue_butterfly[idx] == null) blue_butterfly[idx] = new ArrayList<>();
@@ -115,23 +114,26 @@ public class Projectile{
     public void update(){
         ArrayList<BulletSpawner> temp = new ArrayList<>();
 
-        scale-=0.0002;
+        scale-=0.0002; i+=2;
         timer++;
         gp.player.hitboxesPool = new ArrayList<>();
-        if (timer == time_out) {
-            gp.FPS = 20;
-        }
-        if (timer >= time_out + 3.5*gp.FPS){
+
+        if (timer == time_out + 75) gp.FPS = 20;
+        if (timer >= time_out + 100){
             clearScreen();
-            if (timer >= time_out + 5*gp.FPS) {
+            if (timer == time_out + 160) {
                 gp.FPS = 60;
                 gp.section++;
             }
         }
 
+        if (timer % cycle == 0) {
+            bulletManager = new BulletManager(x, y, timer/cycle);
+        }
+
         //blue wave
         for (int idx = 0; idx < 3; idx++){
-            if (timer < time_out) blue_wave(idx);
+            if (timer <= time_out + 2*60) blue_wave(idx);
             if (blue_butterfly[idx] != null) {
                 numberOfBullets += blue_butterfly[idx].size();
                 for (int i = 0; i < blue_butterfly[idx].size(); i++) {
@@ -198,7 +200,7 @@ public class Projectile{
 
     public void draw(Graphics2D g2d) {
         AffineTransform at = AffineTransform.getTranslateInstance(x - scale*spell_circle.getWidth()/2,y - scale*spell_circle.getHeight()/2);
-        at.rotate(Math.toRadians(i++), scale * spell_circle.getWidth()/2, scale * spell_circle.getHeight()/2);
+        at.rotate(Math.toRadians(i), scale * spell_circle.getWidth()/2, scale * spell_circle.getHeight()/2);
         at.scale(scale, scale);
         g2d.drawImage(spell_circle, at, null);
 
