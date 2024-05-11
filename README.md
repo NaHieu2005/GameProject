@@ -1,4 +1,4 @@
-P/s: This project is made for my OOP class. 
+P/s: This project is created for my OOP class assignment using Java Swing.
 
 I try to recreate a part of Yuyuko's fight from what I can see when playing the original game. It may be different, but I tried to make it like the original as much as I can, and add something my own. Pls enjoy it!
 
