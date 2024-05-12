@@ -25,7 +25,7 @@ public class FirstNon {
         for (double i = direction - angle; i <= direction + angle; i+=angle) {
             b = new BulletSpawner(x, y, speed, i);
             b.setImage("/player/purple_bullet.png");
-            b.setHitbox(6);
+            b.setHitbox(7);
             bullets.add(b);
         }
     }
@@ -41,7 +41,7 @@ public class FirstNon {
         for (double i = direction - 60; i <= direction + 60; i+=angle) {
             b = new BulletSpawner(x, y, speed, i);
             b.setImage("/player/purple_bubble.png");
-            b.setHitbox(24);
+            b.setHitbox(25);
             bullets.add(b);
         }
     }

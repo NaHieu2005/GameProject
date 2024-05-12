@@ -92,7 +92,7 @@ public class BulletManager implements Runnable{
         for (double i = angle/2; i < 360; i+=angle) {
             b = new BulletSpawner(x, y, speed, i);
             b.setImage("/player/red_bubble.png");
-            b.setHitbox(24);
+            b.setHitbox(25);
             bubble.add(b);
         }
     }

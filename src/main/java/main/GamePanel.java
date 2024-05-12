@@ -35,13 +35,6 @@ public class GamePanel extends JPanel implements Runnable{
     Sound se = new Sound();
     Sound bgm = new Sound();
 
-
-    //Player position
-    int PlayerX = 100;
-    int PlayerY = 100;
-    int PlayerSpeed = 6;
-
-
     //Game State
     public int gameState;
     public int titleState = 0;
@@ -53,7 +46,6 @@ public class GamePanel extends JPanel implements Runnable{
     public final int finalSpellSection = 2;
 
     public static int numberOfBullets = 0;
-    public static int time_left = 3600;
 
     public GamePanel(){
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -157,6 +149,7 @@ public class GamePanel extends JPanel implements Runnable{
             player.draw(g2d);
             if (section == firstNonSection) firstNon.draw(g2d);
             if (section == finalSpellSection) pr.draw(g2d);
+            ui.draw(g2d);
         }
 
         if (gameState == pauseState){

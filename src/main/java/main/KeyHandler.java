@@ -46,6 +46,9 @@ public class KeyHandler implements KeyListener {
                         case 1:
                             gp.ui.titleScreenState = 2;
                             break;
+                        case 2:
+                            gp.ui.titleScreenState = 3;
+                            break;
                         case 3:
                             System.exit(0);
                             break;
@@ -90,6 +93,33 @@ public class KeyHandler implements KeyListener {
                 if (key == KeyEvent.VK_ESCAPE){
                     gp.ui.titleScreenState = 0;
                     gp.playSE(1);
+                }
+            }
+
+            else if (gp.ui.titleScreenState == 3){ //Music Room
+                if (key == KeyEvent.VK_Z){
+                    gp.stopMusic();
+                    gp.playMusic(gp.ui.musicState + 5);
+                    gp.playSE(2);
+                }
+
+                else if (key == KeyEvent.VK_UP){
+                    gp.ui.musicState--;
+                    if (gp.ui.musicState < 0) gp.ui.musicState = 2;
+                    gp.playSE(0);
+                }
+
+                else if (key == KeyEvent.VK_DOWN){
+                    gp.ui.musicState++;
+                    if (gp.ui.musicState > 3) gp.ui.musicState = 0;
+                    gp.playSE(0);
+                }
+
+                else if (key == KeyEvent.VK_ESCAPE){
+                    gp.stopMusic();
+                    gp.playMusic(5);
+                    gp.playSE(1);
+                    gp.ui.titleScreenState = 0;
                 }
             }
         }

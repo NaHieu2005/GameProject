@@ -97,7 +97,7 @@ public class BackgroundManager {
                 cherries0.add(cherry);
             }
         }
-        System.out.println(cherries0.getLast().y);
+
         if (cherries1.isEmpty()){
             for (int i = 5; i >= 0; i--) {
                 Cherry cherry = new Cherry(2, 1);

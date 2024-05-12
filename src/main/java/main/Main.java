@@ -7,7 +7,7 @@ public class Main {
         JFrame frame= new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
-        frame.setTitle("Đậu phụ");
+        frame.setTitle("Đậu hũ");
 
         GamePanel gamePanel = new GamePanel();
         frame.add(gamePanel);

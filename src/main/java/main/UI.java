@@ -1,6 +1,7 @@
 package main;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -13,6 +14,8 @@ public class UI {
     public int cursor = 0;
     public int titleScreenState = 0;
     public int characterState = 0;
+    public int musicState = 0;
+    double spriteNum = 0;
 
     public UI(GamePanel gp) {
         this.gp = gp;
@@ -36,6 +39,20 @@ public class UI {
         if (gp.gameState == gp.pauseState){
             drawPauseScreen();
         }
+
+        if (gp.section == 3){
+            drawEndScreen();
+        }
+    }
+
+    private void drawEndScreen() {
+        BufferedImage yummy = null;
+        try {
+            yummy = ImageIO.read(getClass().getResourceAsStream("/player/yummy.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        g2.drawImage(yummy, 0, 0, gp.screenWidth, gp.screenHeight, null);
     }
 
     private void drawPauseScreen() {
@@ -81,6 +98,7 @@ public class UI {
         BufferedImage title = null;
         BufferedImage bg = null;
         BufferedImage bg2 = null;
+
         //System.out.println(titleState);
         switch (titleScreenState){
             case 0:
@@ -231,14 +249,53 @@ public class UI {
                 g2.drawString("Pause", 150, 650);
                 break;
             case 3:
+                BufferedImage gif = null;
+                String filename = "/gif/reimufumo_" + (int)spriteNum + ".png";
+                try {
+                    bg2 = ImageIO.read(getClass().getResourceAsStream("/player/select_bg.png"));
+                    gif = ImageIO.read(getClass().getResourceAsStream(filename));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                g2.drawImage(bg2, 0, 0, gp.screenWidth, gp.screenHeight, null);
+                g2.drawImage(gif, gp.screenWidth/2 - gif.getWidth()/2, 400, null);
+//                g2.setFont(pcb_font);
+//                g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20f));
+//                g2.setColor(Color.GRAY);
 
+                drawString("Music room", 25, 100, Color.WHITE, 50f);
+                drawString("01. Ghostly Dream ~ Snow or Cherry Petal", 25, 200, Color.GRAY, 20f);
+                drawString("02. Bloom Nobly, Ink-Black Cherry Blossom ~ Border of Life", 25, 250, Color.GRAY, 20f);
+                drawString("03. Border of Life.wav", 25, 300, Color.GRAY, 20f);
 
+                switch (musicState){
+                    case 0:
+                        drawString("01. Ghostly Dream ~ Snow or Cherry Petal", 25, 200, Color.WHITE, 20f);
+                        break;
+                    case 1:
+                        drawString("02. Bloom Nobly, Ink-Black Cherry Blossom ~ Border of Life", 25, 250, Color.WHITE, 20f);
+                        break;
+                    case 2:
+                        drawString("03. Border of Life", 25, 300, Color.WHITE, 20f);
+                        break;
+                }
+
+                spriteNum = (spriteNum + 0.2)%20;
+                break;
         }
     }
 
-    public int getXCenteredText(String text){
-        int length = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth();
-        int x = gp.screenWidth/2 - length/2;
-        return x;
+    private void drawString(String str, int x, int y, Color c, float size) {
+        g2.setFont(pcb_font);
+
+        g2.setColor(Color.BLACK);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, size));
+        g2.drawString(str, x + 3, y + 3);
+        g2.drawString(str, x + 4, y + 4);
+        g2.drawString(str, x + 5, y + 5);
+
+        g2.setColor(c);
+        g2.drawString(str, x, y);
     }
+
 }
