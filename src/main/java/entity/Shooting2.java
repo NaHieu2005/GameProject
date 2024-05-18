@@ -30,9 +30,9 @@ public class Shooting2 extends Shooting {
     @Override
     public void getImg() {
         try {
-            amulet = ImageIO.read(getClass().getResourceAsStream("/player/marisa_normal_shot.png"));
-            focusShot = ImageIO.read(getClass().getResourceAsStream("/player/marisa_focus_shot.png"));
-            needle = ImageIO.read(getClass().getResourceAsStream("/player/marisa_unfocus_shot.png"));
+            amulet = ImageIO.read(getClass().getResourceAsStream("/sprite/marisa_normal_shot.png"));
+            focusShot = ImageIO.read(getClass().getResourceAsStream("/sprite/marisa_focus_shot.png"));
+            needle = ImageIO.read(getClass().getResourceAsStream("/sprite/marisa_unfocus_shot.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -55,6 +55,5 @@ public class Shooting2 extends Shooting {
                 g2d.drawImage(needle, (int)x - needle.getWidth()/2, (int)y - needle.getHeight()/2, null);
                 break;
         }
-
     }
 }

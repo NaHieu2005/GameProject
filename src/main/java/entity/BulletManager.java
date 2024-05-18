@@ -30,7 +30,7 @@ public class BulletManager implements Runnable{
 
         for (double i = 0; i < 360; i+=angle) {
             b = new BulletSpawner(x, y, speed, i);
-            b.setImage("/player/blue_butterfly.png");
+            b.setImage("/sprite/blue_butterfly.png");
             b.setHitbox(6);
             blue_butterfly.add(b);
         }
@@ -42,7 +42,7 @@ public class BulletManager implements Runnable{
 
         for (double i = angle/2; i < 360; i+=angle) {
             b = new BulletSpawner(x, y, speed, i);
-            b.setImage("/player/purple_butterfly.png");
+            b.setImage("/sprite/purple_butterfly.png");
             b.setHitbox(6);
             purple_butterfly.add(b);
         }
@@ -55,7 +55,7 @@ public class BulletManager implements Runnable{
 
         for (double i = 0; i < 360; i+=angle) {
             b = new BulletSpawner(x, y, speed, i);
-            b.setImage("/player/red_butterfly.png");
+            b.setImage("/sprite/red_butterfly.png");
             b.setHitbox(6);
             b.setAngle_change(angle_change);
             red_butterfly_1.add(b);
@@ -63,7 +63,7 @@ public class BulletManager implements Runnable{
 
         for (double i = angle/4; i < 360; i+=angle) {
             b = new BulletSpawner(x, y, speed, i);
-            b.setImage("/player/red_butterfly.png");
+            b.setImage("/sprite/red_butterfly.png");
             b.setHitbox(6);
             b.setAngle_change(angle_change);
             red_butterfly_2.add(b);
@@ -71,7 +71,7 @@ public class BulletManager implements Runnable{
 
         for (double i = 0; i < 360; i+=angle) {
             b = new BulletSpawner(x, y, speed, i);
-            b.setImage("/player/red_butterfly.png");
+            b.setImage("/sprite/red_butterfly.png");
             b.setHitbox(6);
             b.setAngle_change(-angle_change);
             red_butterfly_3.add(b);
@@ -79,7 +79,7 @@ public class BulletManager implements Runnable{
 
         for (double i = 3*angle/4; i < 360; i+=angle) {
             b = new BulletSpawner(x, y, speed, i);
-            b.setImage("/player/red_butterfly.png");
+            b.setImage("/sprite/red_butterfly.png");
             b.setHitbox(6);
             b.setAngle_change(-angle_change);
             red_butterfly_4.add(b);
@@ -91,7 +91,7 @@ public class BulletManager implements Runnable{
         BulletSpawner b;
         for (double i = angle/2; i < 360; i+=angle) {
             b = new BulletSpawner(x, y, speed, i);
-            b.setImage("/player/red_bubble.png");
+            b.setImage("/sprite/red_bubble.png");
             b.setHitbox(25);
             bubble.add(b);
         }
@@ -108,6 +108,5 @@ public class BulletManager implements Runnable{
         purple_butterfly(x, y, 3.25);
         red_butterfly(x, y, 3);
         bubble(x, y, 3);
-        System.out.println(wave);
     }
 }

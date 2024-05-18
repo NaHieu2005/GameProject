@@ -2,12 +2,8 @@ package main;
 
 import entity.*;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.plaf.LayerUI;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 public class GamePanel extends JPanel implements Runnable{
     //Screen Setting
@@ -30,21 +26,30 @@ public class GamePanel extends JPanel implements Runnable{
     UI ui;
     public Enemy yuyuko;
     FirstNon firstNon;
-    Projectile pr;
+    FirstSpell firstSpell;
+    FinalSpell finalSpell;
     BackgroundManager bg;
     Sound se = new Sound();
     Sound bgm = new Sound();
 
     //Game State
     public int gameState;
-    public int titleState = 0;
+    public final int titleState = 0;
     public final int playState = 1;
     public final int pauseState = 2;
+    public final int endState = 3;
+    public final int gameOverState = 4;
 
-    public int section = 1;
-    public final int firstNonSection = 1;
+    //Sections
+    public int section;
+    public final int firstNonSection = 0;
+    public final int firstSpellSection = 1;
     public final int finalSpellSection = 2;
+    public final int endSection = 3;
 
+    //Score
+    public boolean isEnd = false;
+    public int damage_score = 0, spellBonus_score = 0, total_score = 0;
     public static int numberOfBullets = 0;
 
     public GamePanel(){
@@ -57,25 +62,26 @@ public class GamePanel extends JPanel implements Runnable{
     }
 
     public void setup(){
+        FPS = 60;
         gameState = titleState;
         ui = new UI(this);
         yuyuko = new Enemy(this);
         firstNon = new FirstNon(this);
-        pr = new Projectile(this);
+        firstSpell = new FirstSpell(this);
+        finalSpell = new FinalSpell(this);
         bg = new BackgroundManager(this);
-        section = 1;
+        section = 0;
+        damage_score = 0;
+        spellBonus_score = 0;
+        total_score = 0;
+        isEnd = false;
         if (bgm.clip != null) stopMusic();
         playMusic(5);
     }
 
     public void restart(){
+        setup();
         gameState = playState;
-        ui = new UI(this);
-        yuyuko = new Enemy(this);
-        firstNon = new FirstNon(this);
-        pr = new Projectile(this);
-        bg = new BackgroundManager(this);
-        section = 1;
         if (bgm.clip != null) stopMusic();
         playMusic(6);
     }
@@ -91,7 +97,6 @@ public class GamePanel extends JPanel implements Runnable{
             double drawInterval = 1000000000/FPS;
             double nextDrawTime = System.nanoTime() + drawInterval;
             update();
-            //System.out.println(player.x + "," + player.y);
             repaint();
 
             try {
@@ -119,19 +124,24 @@ public class GamePanel extends JPanel implements Runnable{
                 yuyuko.setfanVisible(true);
                 firstNon.update();
             }
+
+            if (section == firstSpellSection) {
+                yuyuko.setfanVisible(true);
+                firstSpell.update();
+            }
+
             if (section == finalSpellSection) {
                 yuyuko.setfanVisible(false);
-                pr.update();
+                finalSpell.update();
+            }
+
+            if (section != endSection){
+                yuyuko.update();
             }
 
             bg.update();
-            yuyuko.update();
             player.update();
         }
-        if (gameState == pauseState){
-            //nothing
-        }
-
     }
 
     public void paintComponent(Graphics g){
@@ -145,19 +155,24 @@ public class GamePanel extends JPanel implements Runnable{
 
         if (gameState == playState){
             bg.draw(g2d);
-            yuyuko.draw(g2d);
+            if (section != 3) yuyuko.draw(g2d);
             player.draw(g2d);
             if (section == firstNonSection) firstNon.draw(g2d);
-            if (section == finalSpellSection) pr.draw(g2d);
+            if (section == firstSpellSection) firstSpell.draw(g2d);
+            if (section == finalSpellSection) finalSpell.draw(g2d);
             ui.draw(g2d);
         }
 
-        if (gameState == pauseState){
+        if (gameState == pauseState || gameState == gameOverState){
             bg.draw(g2d);
             yuyuko.draw(g2d);
             player.draw(g2d);
             if (section == firstNonSection) firstNon.draw(g2d);
-            if (section == finalSpellSection) pr.draw(g2d);
+            if (section == finalSpellSection) finalSpell.draw(g2d);
+            ui.draw(g2d);
+        }
+
+        if (gameState == endState){
             ui.draw(g2d);
         }
 

@@ -11,13 +11,12 @@ public class BGEffect {
     GamePanel gp;
     BufferedImage img;
     double x, y, speed;
-    int type;
 
     public BGEffect(GamePanel gp){
         this.speed = 6;
         this.gp = gp;
         try {
-            img = ImageIO.read(getClass().getResourceAsStream("/player/spellcard_bg.png"));
+            img = ImageIO.read(getClass().getResourceAsStream("/sprite/spellcard_bg.png"));
 
         } catch (IOException e) {
             e.printStackTrace();

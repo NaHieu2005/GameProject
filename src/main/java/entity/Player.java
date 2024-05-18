@@ -33,8 +33,8 @@ public class Player{
     ArrayList<Shooting> shoot = new ArrayList<>();
     Hitboxes playerHitbox;
     BufferedImage yinyang, hitbox;
-    static int miss = 0;
     public int invicible = 0;
+    public int live = 5;
     double i = 0;
     double j = 0;
     double k = 0;
@@ -59,23 +59,23 @@ public class Player{
 
     public void getPlayerImage(){
         try {
-            idle1 = ImageIO.read(getClass().getResourceAsStream("/player/reimu_idle1.png"));
-            idle2 = ImageIO.read(getClass().getResourceAsStream("/player/reimu_idle2.png"));
-            idle3 = ImageIO.read(getClass().getResourceAsStream("/player/reimu_idle3.png"));
-            idle4 = ImageIO.read(getClass().getResourceAsStream("/player/reimu_idle4.png"));
-            idle5 = ImageIO.read(getClass().getResourceAsStream("/player/reimu_idle5.png"));
-            left1 = ImageIO.read(getClass().getResourceAsStream("/player/reimu_left1.png"));
-            left2 = ImageIO.read(getClass().getResourceAsStream("/player/reimu_left2.png"));
-            left3 = ImageIO.read(getClass().getResourceAsStream("/player/reimu_left3.png"));
-            left4 = ImageIO.read(getClass().getResourceAsStream("/player/reimu_left4.png"));
-            left5 = ImageIO.read(getClass().getResourceAsStream("/player/reimu_left5.png"));
-            right1 = ImageIO.read(getClass().getResourceAsStream("/player/reimu_right1.png"));
-            right2 = ImageIO.read(getClass().getResourceAsStream("/player/reimu_right2.png"));
-            right3 = ImageIO.read(getClass().getResourceAsStream("/player/reimu_right3.png"));
-            right4 = ImageIO.read(getClass().getResourceAsStream("/player/reimu_right4.png"));
-            right5 = ImageIO.read(getClass().getResourceAsStream("/player/reimu_right5.png"));
-            yinyang = ImageIO.read(getClass().getResourceAsStream("/player/yinyang.png"));
-            hitbox = ImageIO.read(getClass().getResourceAsStream("/player/player_hitbox.png"));
+            idle1 = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_idle1.png"));
+            idle2 = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_idle2.png"));
+            idle3 = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_idle3.png"));
+            idle4 = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_idle4.png"));
+            idle5 = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_idle5.png"));
+            left1 = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_left1.png"));
+            left2 = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_left2.png"));
+            left3 = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_left3.png"));
+            left4 = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_left4.png"));
+            left5 = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_left5.png"));
+            right1 = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_right1.png"));
+            right2 = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_right2.png"));
+            right3 = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_right3.png"));
+            right4 = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_right4.png"));
+            right5 = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_right5.png"));
+            yinyang = ImageIO.read(getClass().getResourceAsStream("/sprite/yinyang.png"));
+            hitbox = ImageIO.read(getClass().getResourceAsStream("/sprite/player_hitbox.png"));
         }
         catch(IOException e){
             e.printStackTrace();
@@ -137,16 +137,38 @@ public class Player{
         else direction = "idle";
 
         //focus
-        if (keyH.focusPressed == true){
-            focusing = true;
-            speed = 3;
-        }
-        else {
-            focusing = false;
-            speed = 6;
-        }
+        focus();
 
         //shoot
+        shoot();
+
+        //sprite
+        spriteCounter++;
+        if (spriteCounter > 10){
+            spriteNum = (spriteNum + 1) % 5;
+            spriteCounter = 0;
+        }
+
+        //hitbox
+        playerHitbox.update(x, y);
+        for (int i = 0; i < hitboxesPool.size(); i++){
+            if (invicible > 0) break;
+            if (checkCollide(playerHitbox, hitboxesPool.get(i))){
+                live--;
+                if (live == 0) {
+                    gp.stopMusic();
+                    gp.gameState = gp.gameOverState;
+                }
+                invicible = 5*60;
+                gp.playSE(4);
+                break;
+            }
+        }
+
+        timer++;
+    }
+
+    void shoot(){
         if (keyH.shootPressed == true && cooldown == 0){
             if (focusing == true){
                 Shooting focus = new Shooting(x, y, 90, 2);
@@ -188,34 +210,23 @@ public class Player{
                 Shooting needle7 = new Shooting(x + 45, y + 10, 90, 3);
                 shoot.add(needle7);
             }
-            cooldown = 5;
+            cooldown = 6;
         }
         else if (keyH.shootPressed == false) {
-            cooldown = 5;
+            cooldown = 3;
         }
         cooldown--;
+    }
 
-        //sprite
-        spriteCounter++;
-        if (spriteCounter > 10){
-            spriteNum = (spriteNum + 1) % 5;
-            spriteCounter = 0;
+    void focus(){
+        if (keyH.focusPressed == true){
+            focusing = true;
+            speed = 3;
         }
-
-        //hitbox
-        playerHitbox.update(x, y);
-        for (int i = 0; i < hitboxesPool.size(); i++){
-            if (invicible > 0) break;
-            if (checkCollide(playerHitbox, hitboxesPool.get(i))){
-                miss++;
-                invicible = 5*60;
-                gp.playSE(4);
-                break;
-                //System.out.println("Got hit:" + miss + " at " + playerHitbox.x + " " + playerHitbox.y);
-            }
+        else {
+            focusing = false;
+            speed = 6;
         }
-
-        timer++;
     }
 
     public void draw(Graphics2D g2d){
@@ -285,13 +296,6 @@ public class Player{
             }
         }
         else g2d.drawImage(image, (int) x - image.getWidth()/2, (int) y - image.getHeight()/2, image.getWidth(), image.getHeight(), null);
-
-        //text
-//        g2d.setColor(Color.WHITE);
-//        g2d.setFont(new Font("Times New Roman", Font.PLAIN, 30));
-//        g2d.drawString("Misscount: " + miss, 30, 30);
-
-        //if (invicible > 0) g2d.drawString("Invicible: " + String.format("%.2f", (double)invicible/60), (int) x + 20, (int) y);
 
 
         //hitbox visible

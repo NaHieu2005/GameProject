@@ -9,19 +9,23 @@ import java.io.InputStream;
 
 public class UI {
     GamePanel gp;
-    Font pcb_font;
+    Font pcb_font, handwritter_font;
     Graphics2D g2;
     public int cursor = 0;
     public int titleScreenState = 0;
     public int characterState = 0;
     public int musicState = 0;
+    int timer = 0;
+    int damage_score = 0, spellBonus_score = 0, liveBonus_score = 0;
     double spriteNum = 0;
+    double creditNum = 800;
 
     public UI(GamePanel gp) {
         this.gp = gp;
         InputStream is = getClass().getResourceAsStream("/font/DCAi-W5-WIN-RKSJ-H-01.ttf");
         try {
             pcb_font = Font.createFont(pcb_font.TRUETYPE_FONT, is);
+            handwritter_font = Font.createFont(handwritter_font.TRUETYPE_FONT, getClass().getResourceAsStream("/font/SVN-Fords-Folly.ttf"));
         } catch (FontFormatException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -31,28 +35,113 @@ public class UI {
 
     public void draw(Graphics2D g2){
         this.g2 = g2;
+        timer++;
 
         if (gp.gameState == gp.titleState){
             drawTitleScreen();
+        }
+
+        if (gp.gameState == gp.playState){
+            drawPlayScreen();
+        }
+
+        if (gp.gameState == gp.endState){
+            drawEndScreen();
         }
 
         if (gp.gameState == gp.pauseState){
             drawPauseScreen();
         }
 
-        if (gp.section == 3){
-            drawEndScreen();
+        if (gp.gameState == gp.gameOverState){
+            drawGameOverScreen();
+        }
+    }
+
+    private void drawGameOverScreen(){
+        BufferedImage blur = null;
+        String text = "Game Over";
+        try {
+            blur = ImageIO.read(getClass().getResourceAsStream("/sprite/blurpane.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        g2.drawImage(blur, 0, 0, gp.screenWidth, gp.screenHeight, null);
+        g2.setFont(handwritter_font);
+        g2.setColor(Color.WHITE);
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 30f));
+        g2.drawString(text, 260, 400);
+    }
+
+    private void drawPlayScreen() {
+        g2.setColor(Color.RED);
+        BufferedImage live0 = null, live1 = null, yuyuko_name = null;
+
+        try {
+            live0 = ImageIO.read(getClass().getResourceAsStream("/sprite/live0.png"));
+            live1 = ImageIO.read(getClass().getResourceAsStream("/sprite/live1.png"));
+            yuyuko_name = ImageIO.read(getClass().getResourceAsStream("/sprite/yuyuko_name.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        g2.drawImage(yuyuko_name, 10, 10, null);
+
+        //live draw
+        for (int i = -2; i <= 2; i++){
+            g2.drawImage(live0, gp.screenWidth/2 - live0.getWidth()/2 + 30*i, 20, null);
+        }
+
+        for (int i = 0; i < gp.player.live; i++){
+            g2.drawImage(live1, gp.screenWidth/2 - live0.getWidth()/2 + 30*(i - 2), 20, null);
+        }
+
+        //score draw
+        if (gp.section == gp.endSection){
+            if (damage_score < gp.damage_score) {
+                damage_score = Math.min(damage_score + 1000000, gp.damage_score);
+            }
+            else if (liveBonus_score < gp.player.live * 2000000) {
+                liveBonus_score = Math.min(liveBonus_score + 100000, gp.player.live * 2000000);
+            }
+            else if (spellBonus_score < gp.spellBonus_score) {
+                spellBonus_score = Math.min(spellBonus_score + 100000, gp.spellBonus_score);
+            }
+            else gp.isEnd = true;
+
+            g2.setFont(pcb_font);
+            drawString("All Clear!", 250, 200, Color.YELLOW, 30);
+            drawString("Damage Score: " + damage_score, 100, 300, Color.YELLOW, 30);
+            drawString("Live Bonus: " + liveBonus_score, 100, 350, Color.YELLOW, 30);
+            drawString("Spellcard Bonus: " + spellBonus_score, 100, 400, Color.YELLOW, 30);
+            drawString("Total Score: " + (damage_score + liveBonus_score + spellBonus_score), 100, 475, Color.YELLOW, 30);
         }
     }
 
     private void drawEndScreen() {
-        BufferedImage yummy = null;
+        BufferedImage bg = null;
         try {
-            yummy = ImageIO.read(getClass().getResourceAsStream("/player/yummy.png"));
+            bg = ImageIO.read(getClass().getResourceAsStream("/sprite/ending_bg.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        g2.drawImage(yummy, 0, 0, gp.screenWidth, gp.screenHeight, null);
+        g2.setFont(handwritter_font);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 30f));
+        g2.setColor(Color.BLACK);
+        g2.drawImage(bg, 0, 0, gp.screenWidth, gp.screenHeight, null);
+        g2.drawString("7th Project Shrine Maiden", 24, (int)(creditNum));
+        g2.drawString("Perfect Cherry Blossom", 28, (int)(creditNum+75));
+        g2.drawString("Original, Graphic and Music", 23 , (int)(creditNum+575));
+        g2.drawString("ZUN", 130, (int)(creditNum+650));
+        g2.drawString("Programming, Reference", 26, (int)(creditNum+1150));
+        g2.drawString("nahieu2005", 99, (int)(creditNum+1225));
+        g2.drawString("19/5/2024", 100 , (int)(creditNum+1300));
+        g2.drawString("Made for OOP game project", 20 , (int)(creditNum+1375));
+        g2.drawString("Thanks for playing!", 37 , (int)(creditNum+1875));
+        if (creditNum + 1875 > gp.screenHeight/2) creditNum--;
+        else{
+            g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40f));
+            g2.drawString("_Next Phantasm", 400, 730);
+        }
     }
 
     private void drawPauseScreen() {
@@ -61,11 +150,11 @@ public class UI {
         int y = gp.screenHeight/2;
 
         try {
-            pause = ImageIO.read(getClass().getResourceAsStream("/player/pause.png"));
-            return_to_game = ImageIO.read(getClass().getResourceAsStream("/player/return_to_game.png"));
-            quit_to_title = ImageIO.read(getClass().getResourceAsStream("/player/quit_to_title.png"));
-            try_again = ImageIO.read(getClass().getResourceAsStream("/player/try_again.png"));
-            blur = ImageIO.read(getClass().getResourceAsStream("/player/blurpane.png"));
+            pause = ImageIO.read(getClass().getResourceAsStream("/sprite/pause.png"));
+            return_to_game = ImageIO.read(getClass().getResourceAsStream("/sprite/return_to_game.png"));
+            quit_to_title = ImageIO.read(getClass().getResourceAsStream("/sprite/quit_to_title.png"));
+            try_again = ImageIO.read(getClass().getResourceAsStream("/sprite/try_again.png"));
+            blur = ImageIO.read(getClass().getResourceAsStream("/sprite/blurpane.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,13 +188,12 @@ public class UI {
         BufferedImage bg = null;
         BufferedImage bg2 = null;
 
-        //System.out.println(titleState);
         switch (titleScreenState){
             case 0:
                 //TITLE
                 try {
-                    title = ImageIO.read(getClass().getResourceAsStream("/player/title.png"));
-                    bg = ImageIO.read(getClass().getResourceAsStream("/player/title_bg.png"));
+                    title = ImageIO.read(getClass().getResourceAsStream("/sprite/title.png"));
+                    bg = ImageIO.read(getClass().getResourceAsStream("/sprite/title_bg.png"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -149,6 +237,10 @@ public class UI {
                 if (cursor == 3) g2.setColor(Color.WHITE);
                 g2.drawString(text, x, y);
 
+                text = "Press Z and Arrows to navigate";
+                g2.setFont(new Font("Arial", Font.BOLD, 20));
+                g2.setColor(Color.WHITE);
+                if (timer % 60 < 30) g2.drawString(text, 175, 750);
                 break;
             case 1: //Character Select
                 BufferedImage charImg = null;
@@ -166,12 +258,12 @@ public class UI {
                 if (characterState == 0){ //Reimu
                     //IMAGE
                     try {
-                        s_bg = ImageIO.read(getClass().getResourceAsStream("/player/select_bg.png"));
-                        charImg = ImageIO.read(getClass().getResourceAsStream("/player/reimu_select.png"));
-                        choose_girl = ImageIO.read(getClass().getResourceAsStream("/player/choose_girl.png"));
-                        name = ImageIO.read(getClass().getResourceAsStream("/player/reimu_name.png"));
-                        stat = ImageIO.read(getClass().getResourceAsStream("/player/reimu_stat.png"));
-                        diff = ImageIO.read(getClass().getResourceAsStream("/player/lunatic.png"));
+                        s_bg = ImageIO.read(getClass().getResourceAsStream("/sprite/select_bg.png"));
+                        charImg = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_select.png"));
+                        choose_girl = ImageIO.read(getClass().getResourceAsStream("/sprite/choose_girl.png"));
+                        name = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_name.png"));
+                        stat = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_stat.png"));
+                        diff = ImageIO.read(getClass().getResourceAsStream("/sprite/lunatic.png"));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -188,12 +280,12 @@ public class UI {
                 if (characterState == 1){//Marisa
                     //IMAGE
                     try {
-                        s_bg = ImageIO.read(getClass().getResourceAsStream("/player/select_bg.png"));
-                        charImg = ImageIO.read(getClass().getResourceAsStream("/player/marisa_select.png"));
-                        choose_girl = ImageIO.read(getClass().getResourceAsStream("/player/choose_girl.png"));
-                        name = ImageIO.read(getClass().getResourceAsStream("/player/marisa_name.png"));
-                        stat = ImageIO.read(getClass().getResourceAsStream("/player/marisa_stat.png"));
-                        diff = ImageIO.read(getClass().getResourceAsStream("/player/lunatic.png"));
+                        s_bg = ImageIO.read(getClass().getResourceAsStream("/sprite/select_bg.png"));
+                        charImg = ImageIO.read(getClass().getResourceAsStream("/sprite/marisa_select.png"));
+                        choose_girl = ImageIO.read(getClass().getResourceAsStream("/sprite/choose_girl.png"));
+                        name = ImageIO.read(getClass().getResourceAsStream("/sprite/marisa_name.png"));
+                        stat = ImageIO.read(getClass().getResourceAsStream("/sprite/marisa_stat.png"));
+                        diff = ImageIO.read(getClass().getResourceAsStream("/sprite/lunatic.png"));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -210,14 +302,14 @@ public class UI {
                 break;
             case 2: //Manual
                 try {
-                    bg2 = ImageIO.read(getClass().getResourceAsStream("/player/manual_bg.png"));
+                    bg2 = ImageIO.read(getClass().getResourceAsStream("/sprite/manual_bg.png"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 g2.drawImage(bg2, 0, 0, gp.screenWidth, gp.screenHeight, null);
 
                 g2.setColor(Color.PINK);
-                g2.drawString("Introduction", 25, 100);
+                drawString("Introduction", 25, 100, Color.PINK, 45f);
 
                 g2.setFont(new Font("Arial", Font.PLAIN, 25));
                 g2.setColor(Color.WHITE);
@@ -229,36 +321,36 @@ public class UI {
                 g2.setFont(pcb_font);
                 g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 45f));
                 g2.setColor(Color.PINK);
-                g2.drawString("Control", 25, 400);
+                drawString("Control", 25, 400, Color.PINK, 45f);
 
                 g2.setFont(new Font("Arial", Font.BOLD, 25));
                 g2.setColor(Color.WHITE);
 
                 g2.drawString("Arrow:", 30, 450);
                 g2.drawString("Z:", 30, 500);
-                g2.drawString("X:", 30, 550);
-                g2.drawString("Shift:", 30, 600);
-                g2.drawString("Esc:", 30, 650);
+                g2.drawString("Shift:", 30, 550);
+                g2.drawString("Esc:", 30, 600);
 
                 g2.setFont(new Font("Arial", Font.BOLD, 25));
                 g2.setColor(Color.WHITE);
                 g2.drawString("Player movement", 150, 450);
                 g2.drawString("Shoot", 150, 500);
-                g2.drawString("SpellCard", 150, 550);
-                g2.drawString("Slower movement (Focus)", 150, 600);
-                g2.drawString("Pause", 150, 650);
+                g2.drawString("Slower movement (Focus)", 150, 550);
+                g2.drawString("Pause", 150, 600);
                 break;
             case 3:
                 BufferedImage gif = null;
                 String filename = "/gif/reimufumo_" + (int)spriteNum + ".png";
+
                 try {
-                    bg2 = ImageIO.read(getClass().getResourceAsStream("/player/select_bg.png"));
+                    bg2 = ImageIO.read(getClass().getResourceAsStream("/sprite/select_bg.png"));
                     gif = ImageIO.read(getClass().getResourceAsStream(filename));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
                 g2.drawImage(bg2, 0, 0, gp.screenWidth, gp.screenHeight, null);
-                g2.drawImage(gif, gp.screenWidth/2 - gif.getWidth()/2, 400, null);
+                g2.drawImage(gif, gp.screenWidth/2 - gif.getWidth()/2, 425, null);
 //                g2.setFont(pcb_font);
 //                g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20f));
 //                g2.setColor(Color.GRAY);
@@ -266,8 +358,8 @@ public class UI {
                 drawString("Music room", 25, 100, Color.WHITE, 50f);
                 drawString("01. Ghostly Dream ~ Snow or Cherry Petal", 25, 200, Color.GRAY, 20f);
                 drawString("02. Bloom Nobly, Ink-Black Cherry Blossom ~ Border of Life", 25, 250, Color.GRAY, 20f);
-                drawString("03. Border of Life.wav", 25, 300, Color.GRAY, 20f);
-
+                drawString("03. Border of Life", 25, 300, Color.GRAY, 20f);
+                drawString("04. Sakura, Sakura ~ Japanize Dream..", 25, 350, Color.GRAY, 20f);
                 switch (musicState){
                     case 0:
                         drawString("01. Ghostly Dream ~ Snow or Cherry Petal", 25, 200, Color.WHITE, 20f);
@@ -277,6 +369,9 @@ public class UI {
                         break;
                     case 2:
                         drawString("03. Border of Life", 25, 300, Color.WHITE, 20f);
+                        break;
+                    case 3:
+                        drawString("04. Sakura, Sakura ~ Japanize Dream..", 25, 350, Color.WHITE, 20f);
                         break;
                 }
 

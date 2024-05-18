@@ -5,45 +5,54 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.nio.Buffer;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import static main.GamePanel.numberOfBullets;
 
-public class Projectile{
+public class FinalSpell {
     GamePanel gp;
+    Enemy enemy;
     BulletManager bulletManager;
+    BufferedImage spell_circle, effect1, effect2;
+    Font font;
     public int timer = 1;
     public int cycle = 9*60;
-    BufferedImage bg, spell_circle;
     int time_out = 67*60, i = 0;
+    int bonus_score = 3000000;
+    int capture_bonus = 5000000;
     double x, y, scale = 1;
+    double laser_gap;
+    boolean missed = false;
 
     ArrayList<BulletSpawner> bubble = new ArrayList<>();
     ArrayList<BulletSpawner>[] blue_butterfly = new ArrayList[3];
     ArrayList<BulletSpawner>[] red_butterfly = new ArrayList[8];
+    ArrayList<LaserSpawner> lasers = new ArrayList<>();
 
 
-    public Projectile(GamePanel gp) {
+    public FinalSpell(GamePanel gp) {
         this.gp = gp;
-        this.x = gp.screenWidth/2;
-        this.y = 150;
+        this.enemy = gp.yuyuko;
+        this.x = enemy.x;
+        this.y = enemy.y;
         this.bulletManager = new BulletManager(x, y, 0);
         getImg();
     }
 
-    void getImg(){
+    private void getImg(){
         try {
-            spell_circle = ImageIO.read(getClass().getResourceAsStream("/player/circle.png"));
+            spell_circle = ImageIO.read(getClass().getResourceAsStream("/sprite/circle.png"));
+            effect1 = ImageIO.read(getClass().getResourceAsStream("/sprite/effect1.png"));
+            effect2 = ImageIO.read(getClass().getResourceAsStream("/sprite/effect2.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void red_wave(int cnt){
+    private void red_wave(int cnt){
         ArrayList<BulletSpawner> temp = new ArrayList<>();
 
         //1
@@ -80,7 +89,7 @@ public class Projectile{
     }
 
 
-    public void blue_wave(int idx){
+    private void blue_wave(int idx){
         ArrayList<BulletSpawner> temp = new ArrayList<>();
 
         if (timer % cycle == 3*60 + 20*idx){
@@ -103,12 +112,55 @@ public class Projectile{
         }
     }
 
-    private ArrayList<BulletSpawner> copy(ArrayList<BulletSpawner> list){
-        ArrayList<BulletSpawner> temp = new ArrayList<>();
-        for (BulletSpawner b : list){
-            temp.add(new BulletSpawner(b, b.speed));
+    void laserManager(){
+        if (timer % cycle == 240){
+            int wave = timer/cycle;
+            laser_gap = 360/(3 + (double)wave);
+            lasers = new ArrayList<>();
+            for (double angle = 90 + laser_gap/4; angle < 360 + 90 + laser_gap/4; angle += laser_gap){
+                double radius = 100;
+                double X = x + radius*Math.cos(Math.toRadians(angle));
+                double Y = y + radius*Math.sin(Math.toRadians(angle));
+                LaserSpawner laser = new LaserSpawner(X, Y, angle);
+                laser.setImage("/sprite/purple_laser.png");
+                lasers.add(laser);
+            }
+
+            for (double angle = 90 + 3*laser_gap/4; angle < 360 + 90 + 3*laser_gap/4; angle += laser_gap){
+                double radius = 100;
+                double X = x + radius*Math.cos(Math.toRadians(angle));
+                double Y = y + radius*Math.sin(Math.toRadians(angle));
+                LaserSpawner laser = new LaserSpawner(X, Y, angle);
+                laser.setImage("/sprite/blue_laser.png");
+                lasers.add(laser);
+            }
         }
+        if (timer % cycle >= 240 && timer % cycle <= 420){
+            for (int i = 0; i < lasers.size(); i++){
+                gp.player.hitboxesPool.addAll(lasers.get(i).getHitbox());
+            }
+        }
+    }
+
+    private ArrayList<BulletSpawner> copy(ArrayList<BulletSpawner> list){
+        ArrayList<BulletSpawner> temp = list.stream().map(b -> new BulletSpawner(b, b.speed)).collect(Collectors.toCollection(ArrayList::new));
         return temp;
+    }
+
+    boolean checkEnd(){
+        if (timer == time_out + 75) gp.FPS = 20;
+        if (timer >= time_out + 100){
+            clearScreen();
+            if (timer == time_out + 160) {
+                gp.FPS = 60;
+                gp.spellBonus_score += bonus_score;
+                if (!missed) gp.spellBonus_score += capture_bonus;
+                gp.player.hitboxesPool = new ArrayList<>();
+                gp.section++;
+                return true;
+            }
+        }
+        return false;
     }
 
     public void update(){
@@ -118,18 +170,20 @@ public class Projectile{
         timer++;
         gp.player.hitboxesPool = new ArrayList<>();
 
-        if (timer == time_out + 75) gp.FPS = 20;
-        if (timer >= time_out + 100){
-            clearScreen();
-            if (timer == time_out + 160) {
-                gp.FPS = 60;
-                gp.section++;
-            }
-        }
+        //end
+        if (checkEnd()) return;
 
+        //move
+        enemy.x -=0.02;
+        x -= 0.02;
+
+        //wave buff
         if (timer % cycle == 0) {
             bulletManager = new BulletManager(x, y, timer/cycle);
         }
+
+        //laser
+        laserManager();
 
         //blue wave
         for (int idx = 0; idx < 3; idx++){
@@ -180,29 +234,79 @@ public class Projectile{
         }
 
         for (int i = 0 ; i < bubble.size(); i++){
-            //System.out.println(bubble.get(i).hitbox.x + " " + bubble.get(i).hitbox.y);
             bubble.get(i).update();
             gp.player.hitboxesPool.add(bubble.get(i).hitbox);
         }
         numberOfBullets += bubble.size();
 
-        //miss state
+        //check miss
         if (gp.player.invicible >= 4*60 + 30) {
             System.out.println("cleared");
             clearScreen();
         }
 
-        //System.out.println(gp.player.hitboxesPool.size());
-        //System.out.println("timer: " + (double)timer/60);
-
+        if (gp.player.invicible == 5*60) {
+            missed = true;
+        }
     }
 
 
     public void draw(Graphics2D g2d) {
+        if (font == null){
+            InputStream is = getClass().getResourceAsStream("/font/DCAi-W5-WIN-RKSJ-H-01.ttf");
+            try {
+                font = Font.createFont(font.TRUETYPE_FONT, is);
+            } catch (FontFormatException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //Circle
         AffineTransform at = AffineTransform.getTranslateInstance(x - scale*spell_circle.getWidth()/2,y - scale*spell_circle.getHeight()/2);
         at.rotate(Math.toRadians(i), scale * spell_circle.getWidth()/2, scale * spell_circle.getHeight()/2);
         at.scale(scale, scale);
         g2d.drawImage(spell_circle, at, null);
+
+        //bullets
+        if (timer % cycle >= 240 && timer % cycle <= 420){
+            for (int i = 0; i < lasers.size(); i++){
+                LaserSpawner l = lasers.get(i);
+                l.draw(g2d);
+                if (i < lasers.size()/2) g2d.drawImage(effect1, (int)l.x - effect1.getWidth()/2, (int)l.y - effect1.getHeight()/2, null);
+                else g2d.drawImage(effect2, (int)l.x - effect2.getWidth()/2, (int)l.y - effect2.getHeight()/2, null);
+            }
+        }
+        else if (timer % cycle >= 180 && timer % cycle <= 240){
+            int wave = timer/cycle;
+            laser_gap = 360/(3 + (double)wave);
+            g2d.setColor(Color.MAGENTA);
+            double begin = (double) (timer % cycle - 180) / 60 * laser_gap + laser_gap/4 + 90;
+            for (double angle = begin; angle < 360 + begin; angle += laser_gap){
+                double radius = 100;
+                double X1 = x + radius*Math.cos(Math.toRadians(angle));
+                double Y1 = y + radius*Math.sin(Math.toRadians(angle));
+                radius = 1000;
+                double X2 = x + radius*Math.cos(Math.toRadians(angle));
+                double Y2 = y + radius*Math.sin(Math.toRadians(angle));
+                g2d.drawLine((int) X1, (int)Y1, (int)X2, (int)Y2);
+                g2d.drawImage(effect1, (int)X1 - effect1.getWidth()/2, (int)Y1 - effect1.getHeight()/2, null);
+            }
+            g2d.setColor(Color.CYAN);
+            begin = (double) (180 - timer % cycle) / 60 * laser_gap + 3*laser_gap/4 + 90;
+            for (double angle = begin; angle < 360 + begin; angle += laser_gap){
+                double radius = 100;
+                double X1 = x + radius*Math.cos(Math.toRadians(angle));
+                double Y1 = y + radius*Math.sin(Math.toRadians(angle));
+                radius = 1000;
+                double X2 = x + radius*Math.cos(Math.toRadians(angle));
+                double Y2 = y + radius*Math.sin(Math.toRadians(angle));
+                g2d.drawLine((int) X1, (int)Y1, (int)X2, (int)Y2);
+                g2d.drawImage(effect2, (int)X1 - effect2.getWidth()/2, (int)Y1 - effect2.getHeight()/2, null);
+            }
+        }
+
 
         for (int i = 0; i < bubble.size(); i++){
             bubble.get(i).draw(g2d);
@@ -221,11 +325,18 @@ public class Projectile{
                 }
         }
 
-        g2d.setFont(new Font("Arial", Font.PLAIN, 25));
-        g2d.drawString("" + Math.max(0,(time_out - timer)) / 60, gp.screenWidth/2, 50);
+        //countdown
+        g2d.setFont(font);
+        g2d.setFont(g2d.getFont().deriveFont(Font.PLAIN, 40f));
+        g2d.setColor(Color.PINK);
+
+        int countdown = Math.max(0,(time_out - timer)) / 60;
+        String timetxt = "" + countdown;
+        if (countdown < 10) timetxt = "0" + countdown;
+        g2d.drawString(timetxt, gp.screenWidth - 50, 50);;
     }
 
-    public void clearScreen() {
+    private void clearScreen() {
         for (int i = 0; i < 3; i++) {
             if (blue_butterfly[i] != null){
                 blue_butterfly[i] = new ArrayList<>();

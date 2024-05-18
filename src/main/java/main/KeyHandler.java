@@ -34,7 +34,7 @@ public class KeyHandler implements KeyListener {
                 if (key == KeyEvent.VK_DOWN){
                     gp.ui.cursor++;
                     if (gp.ui.cursor > 3) gp.ui.cursor = 0;
-                        gp.playSE(0);
+                    gp.playSE(0);
                 }
 
                 if (key == KeyEvent.VK_Z){
@@ -105,7 +105,7 @@ public class KeyHandler implements KeyListener {
 
                 else if (key == KeyEvent.VK_UP){
                     gp.ui.musicState--;
-                    if (gp.ui.musicState < 0) gp.ui.musicState = 2;
+                    if (gp.ui.musicState < 0) gp.ui.musicState = 3;
                     gp.playSE(0);
                 }
 
@@ -128,8 +128,16 @@ public class KeyHandler implements KeyListener {
             if (key == KeyEvent.VK_ESCAPE){
                 gp.gameState = gp.pauseState;
                 gp.ui.cursor = 0;
-                gp.playSE(8);
+                gp.playSE(9);
                 gp.stopMusic();
+            }
+
+            else if (gp.section == 3){
+                if (key == KeyEvent.VK_Z && gp.isEnd){
+                    gp.stopMusic();
+                    gp.playMusic(8);
+                    gp.gameState = gp.endState;
+                }
             }
         }
 
@@ -158,8 +166,23 @@ public class KeyHandler implements KeyListener {
                         break;
                     case 2: //try again
                         gp.restart();
+                        gp.player.live = 5;
                         break;
                 }
+            }
+        }
+
+        else if (gp.gameState == gp.endState){
+            if (key == KeyEvent.VK_Z){
+                if (gp.ui.creditNum + 1875 <= gp.screenHeight/2) gp.setup();
+                else gp.ui.creditNum-=5;
+            }
+        }
+
+        else if (gp.gameState == gp.gameOverState){
+            if (key == KeyEvent.VK_Z){
+                gp.setup();
+                gp.playSE(1);
             }
         }
 

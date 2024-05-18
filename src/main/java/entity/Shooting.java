@@ -40,9 +40,9 @@ public class Shooting {
 
     public void getImg(){
         try {
-            amulet = ImageIO.read(getClass().getResourceAsStream("/player/reimu_amulet.png"));
-            focusShot = ImageIO.read(getClass().getResourceAsStream("/player/reimu_focus_shot.png"));
-            needle = ImageIO.read(getClass().getResourceAsStream("/player/needle.png"));
+            amulet = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_amulet.png"));
+            focusShot = ImageIO.read(getClass().getResourceAsStream("/sprite/reimu_focus_shot.png"));
+            needle = ImageIO.read(getClass().getResourceAsStream("/sprite/needle.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }

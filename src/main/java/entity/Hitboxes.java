@@ -10,11 +10,7 @@ public class Hitboxes {
 
     public static boolean checkCollide(Hitboxes a, Hitboxes b) {
         double dist = Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
-        //System.out.println(b.x + " " + b.y + " " + b.r + " " + dist);
-        if (dist < a.r + b.r) {
-            return true;
-        }
-        return false;
+        return dist < a.r + b.r;
     }
 
     public void update(double x, double y){

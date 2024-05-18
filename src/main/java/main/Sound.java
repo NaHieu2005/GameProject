@@ -18,7 +18,8 @@ public class Sound {
         soundURL[5] = getClass().getResource("/sound/01. Ghostly Dream ~ Snow or Cherry Petal.wav");
         soundURL[6] = getClass().getResource("/sound/13. Bloom Nobly, Ink-Black Cherry Blossom ~ Border of Life.wav");
         soundURL[7] = getClass().getResource("/sound/14. Border of Life.wav");
-        soundURL[8] = getClass().getResource("/sound/se_pause.wav");
+        soundURL[8] = getClass().getResource("/sound/20. Sakura, Sakura ~ Japanize Dream...wav");
+        soundURL[9] = getClass().getResource("/sound/se_pause.wav");
     }
 
     public void setFile(int i){

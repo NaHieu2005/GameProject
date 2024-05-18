@@ -4,14 +4,15 @@ import main.GamePanel;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class BackgroundManager {
     GamePanel gp;
-    BufferedImage bg, spell_bg, tree;
-    int timer = 0;
+    BufferedImage bg, spell_bg, tree, bg_circle;
+    int timer = 0, i = 0;
 
     public BackgroundManager(GamePanel gp){
         this.gp = gp;
@@ -21,14 +22,13 @@ public class BackgroundManager {
     public class Cherry{
         BufferedImage img;
         double x, y, speed;
-        int type;
 
         public Cherry(double speed, int type){
             this.speed = speed;
             try {
-                if (type == 0) img = ImageIO.read(getClass().getResourceAsStream("/player/cherry0.png"));
-                if (type == 1) img = ImageIO.read(getClass().getResourceAsStream("/player/cherry1.png"));
-                if (type == 2) img = ImageIO.read(getClass().getResourceAsStream("/player/cherry2.png"));
+                if (type == 0) img = ImageIO.read(getClass().getResourceAsStream("/sprite/cherry0.png"));
+                if (type == 1) img = ImageIO.read(getClass().getResourceAsStream("/sprite/cherry1.png"));
+                if (type == 2) img = ImageIO.read(getClass().getResourceAsStream("/sprite/cherry2.png"));
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -53,9 +53,10 @@ public class BackgroundManager {
 
     private void getImg(){
         try {
-            bg = ImageIO.read(getClass().getResourceAsStream("/player/s6_bg.png"));
-            spell_bg = ImageIO.read(getClass().getResourceAsStream("/player/spellcard_bg.png"));
-            tree = ImageIO.read(getClass().getResourceAsStream("/player/spellcard_tree.png"));
+            bg = ImageIO.read(getClass().getResourceAsStream("/sprite/s6_bg.png"));
+            spell_bg = ImageIO.read(getClass().getResourceAsStream("/sprite/spellcard_bg.png"));
+            tree = ImageIO.read(getClass().getResourceAsStream("/sprite/spellcard_tree.png"));
+            bg_circle = ImageIO.read(getClass().getResourceAsStream("/sprite/bg_circle.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -87,6 +88,7 @@ public class BackgroundManager {
     ArrayList<BGEffect> effects = new ArrayList<>();
     public void update(){
         timer++;
+        i++;
         erase();
 
         //init
@@ -160,25 +162,30 @@ public class BackgroundManager {
     }
 
     public void draw(Graphics2D g2d){
-        g2d.drawImage(bg,0,0, gp.screenWidth, gp.screenHeight, null);
-
-        for (int i = 0; i < cherries0.size(); i++){
-            cherries0.get(i).draw(g2d);
-        }
-
-        for (int i = 0; i < cherries1.size(); i++){
-            cherries1.get(i).draw(g2d);
-        }
-
-        for (int i = 0; i < cherries2.size(); i++){
-            cherries2.get(i).draw(g2d);
-        }
-
-        if (gp.section == gp.finalSpellSection) {
+        if (gp.section == gp.finalSpellSection || gp.section == gp.firstSpellSection) {
             for (int i = 0; i < effects.size(); i++){
                 effects.get(i).draw(g2d);
             }
             g2d.drawImage(tree,0,0, gp.screenWidth, gp.screenHeight, null);
+        }
+        else{
+            g2d.drawImage(bg,0,0, gp.screenWidth, gp.screenHeight, null);
+
+            AffineTransform at = AffineTransform.getTranslateInstance(gp.screenWidth/2 - bg_circle.getWidth()/2,200 - bg_circle.getHeight()/2);
+            at.rotate(Math.toRadians(i), bg_circle.getWidth()/2, bg_circle.getHeight()/2);
+            g2d.drawImage(bg_circle, at, null);
+
+            for (int i = 0; i < cherries0.size(); i++){
+                cherries0.get(i).draw(g2d);
+            }
+
+            for (int i = 0; i < cherries1.size(); i++){
+                cherries1.get(i).draw(g2d);
+            }
+
+            for (int i = 0; i < cherries2.size(); i++){
+                cherries2.get(i).draw(g2d);
+            }
         }
     }
 }
